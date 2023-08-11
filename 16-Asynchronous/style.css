@@ -24,6 +24,10 @@ body {
   display: flex;
   flex-flow: column;
   align-items: center;
+  flex-wrap: wrap;
+  max-width: 1400px;
+  margin-inline: auto;
+  width: 100%;
 }
 
 .countries {
@@ -33,6 +37,9 @@ body {
   font-size: 2rem;
   opacity: 0;
   transition: opacity 1s;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
 }
 
 .country {
