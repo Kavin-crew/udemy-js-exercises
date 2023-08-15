@@ -48,7 +48,7 @@ const getCountry = function (...countries) {
 
     request.addEventListener('load', function () {
       const [data] = JSON.parse(this.responseText);
-      console.log(data);
+      // console.log(data);
 
       const html = `
                     <article class="country">
@@ -75,7 +75,7 @@ const getCountry = function (...countries) {
   });
 };
 
-getCountry('usa', 'portugal', 'ph', 'germany', 'japan');
+// getCountry('usa', 'portugal', 'ph', 'germany', 'japan');
 
 // ////////////////////////////////////////////////////////////////////////
 // const lotteryPromise = new Promise(function (resolve, reject) {
@@ -112,48 +112,101 @@ getCountry('usa', 'portugal', 'ph', 'germany', 'japan');
 
 /////////////////////////////////////////////////
 ///// Coding challenge#2
-const wait = function (seconds) {
-  return new Promise(function (resolve) {
-    setTimeout(resolve, seconds * 1000);
-  });
-};
+// const wait = function (seconds) {
+//   return new Promise(function (resolve) {
+//     setTimeout(resolve, seconds * 1000);
+//   });
+// };
 
-// global variable
-const imgContainer = document.querySelector('.images');
+// // global variable
+// const imgContainer = document.querySelector('.images');
 
-const createImage = function (imgPath) {
-  // return new promise
+// const createImage = function (imgPath) {
+//   // return new promise
+//   return new Promise(function (resolve, reject) {
+//     const img = document.createElement('img');
+//     img.src = imgPath;
+
+//     img.addEventListener('load', function () {
+//       imgContainer.append(img);
+//       resolve(img);
+//     });
+
+//     img.addEventListener('error', function () {
+//       reject(new Error('Image not found'));
+//     });
+//   });
+// };
+// let currentImg;
+// createImage('img/img-1.jpg')
+//   .then(img => {
+//     currentImg = img;
+//     console.log('Image 1 loaded');
+//     return wait(2);
+//   })
+//   .then(() => {
+//     currentImg.style.display = 'none';
+//     return createImage('img/img-2.jpg');
+//   })
+//   .then(img => {
+//     currentImg = img;
+//     console.log('Image 2 loaded');
+//     return wait(2);
+//   })
+//   .then(() => {
+//     currentImg.style.display = 'none';
+//   })
+//   .catch(err => console.error(err));
+
+////////////////////////////////////////////////////////////////
+/// 2017 async await
+
+// to get our current position
+const getPosition = function () {
   return new Promise(function (resolve, reject) {
-    const img = document.createElement('img');
-    img.src = imgPath;
-
-    img.addEventListener('load', function () {
-      imgContainer.append(img);
-      resolve(img);
-    });
-
-    img.addEventListener('error', function () {
-      reject(new Error('Image not found'));
-    });
+    navigator.geolocation.getCurrentPosition(resolve, reject);
   });
 };
-let currentImg;
-createImage('img/img-1.jpg')
-  .then(img => {
-    currentImg = img;
-    console.log('Image 1 loaded');
-    return wait(2);
-  })
-  .then(() => {
-    currentImg.style.display = 'none';
-    return createImage('img/img-2.jpg');
-  })
-  .then(img => {
-    currentImg = img;
-    console.log('Image 2 loaded');
-    return wait(2);
-  })
-  .then(() => {
-    currentImg.style.display = 'none';
-  })
-  .catch(err => console.error(err));
+
+const whereAmI = async function () {
+  // Geolocation
+  const pos = await getPosition();
+  const { latitude: lat, longitude: lng } = pos.coords;
+
+  //reverse geocoding
+  const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+  const dataGeo = await resGeo.json();
+  // console.log(dataGeo);
+
+  // country data
+  const res = await fetch(
+    `https://restcountries.com/v3.1/name/${dataGeo.country}`
+  );
+  const [data] = await res.json();
+
+  // console.log([data]);
+
+  const html = `
+                    <article class="country">
+                    <img class="country__img" src="${data.flags.svg}" />
+                    <div class="country__data">
+                        <h3 class="country__name">${data.name.common}</h3>
+                        <h4 class="country__region">REGION</h4>
+                        <p class="country__row"><span>👫</span>${(
+                          +data.population / 1000000
+                        ).toFixed(1)}M people</p>
+                        <p class="country__row"><span>🗣️</span>${
+                          Object.entries(data.languages)[0][1]
+                        }</p>
+                        <p class="country__row"><span>💰</span>${
+                          Object.entries(data.currencies)[0][0]
+                        }</p>
+                    </div>
+                    </article>
+                `;
+
+  countriesContainer.insertAdjacentHTML('beforeend', html);
+  countriesContainer.style.opacity = '1';
+};
+
+whereAmI();
