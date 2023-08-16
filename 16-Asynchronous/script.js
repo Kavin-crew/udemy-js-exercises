@@ -169,24 +169,28 @@ const getPosition = function () {
 };
 
 const whereAmI = async function () {
-  // Geolocation
-  const pos = await getPosition();
-  const { latitude: lat, longitude: lng } = pos.coords;
+  try {
+    // Geolocation
+    const pos = await getPosition();
+    const { latitude: lat, longitude: lng } = pos.coords;
 
-  //reverse geocoding
-  const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
-  const dataGeo = await resGeo.json();
-  // console.log(dataGeo);
+    //reverse geocoding
+    const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+    const dataGeo = await resGeo.json();
+    // error 404 and 403 will not get rejected
+    // so we need to manually handle the error
+    if (!dataGeo.ok) throw new Error('Problem getting location');
 
-  // country data
-  const res = await fetch(
-    `https://restcountries.com/v3.1/name/${dataGeo.country}`
-  );
-  const [data] = await res.json();
+    // country data
+    const res = await fetch(
+      `https://restcountries.com/v3.1/name/${dataGeo.country}`
+    );
+    if (!res.ok) throw new Error('Problem getting location');
+    const [data] = await res.json();
 
-  // console.log([data]);
+    // console.log([data]);
 
-  const html = `
+    const html = `
                     <article class="country">
                     <img class="country__img" src="${data.flags.svg}" />
                     <div class="country__data">
@@ -205,8 +209,11 @@ const whereAmI = async function () {
                     </article>
                 `;
 
-  countriesContainer.insertAdjacentHTML('beforeend', html);
-  countriesContainer.style.opacity = '1';
+    countriesContainer.insertAdjacentHTML('beforeend', html);
+    countriesContainer.style.opacity = '1';
+  } catch (err) {
+    console.error(err.message);
+  }
 };
 
 whereAmI();
