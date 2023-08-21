@@ -226,13 +226,13 @@ getCountry('usa', 'portugal', 'ph', 'germany', 'japan');
 
 // ///////////////////////////////
 // parallel promises
-// const getJSON = function (url, errorMsg = 'Something went wrong') {
-//   return fetch(url).then(response => {
-//     if (!response.ok) throw new Error(`${errorMsg} (${response.status})`);
+const getJSON = function (url, errorMsg = 'Something went wrong') {
+  return fetch(url).then(response => {
+    if (!response.ok) throw new Error(`${errorMsg} (${response.status})`);
 
-//     return response.json();
-//   });
-// };
+    return response.json();
+  });
+};
 
 // const get3Countries = async function (c1, c2, c3) {
 //   try {
@@ -250,3 +250,37 @@ getCountry('usa', 'portugal', 'ph', 'germany', 'japan');
 // };
 
 // get3Countries('portugal', 'canada', 'tanzania');
+
+// ///////////////////////////////
+// race promises
+(async function () {
+  try {
+    const response = await Promise.race([
+      getJSON(`https://restcountries.com/v3.1/name/mexico`),
+      getJSON(`https://restcountries.com/v3.1/name/italy`),
+      getJSON(`https://restcountries.com/v3.1/name/egypt`),
+    ]);
+    console.log(response[0].name.common);
+  } catch (err) {
+    console.error(err);
+  }
+})();
+
+//////////////////////////////////
+//race promise w/ timeout
+// in scenario that sending a message for a given time,
+// then fires the time out as reject
+const timeout = function (sec) {
+  return new Promise((_, reject) => {
+    setTimeout(function () {
+      reject(new Error('Request took too long!'));
+    }, sec * 1000);
+  });
+};
+
+Promise.race([
+  getJSON(`https://restcountries.com/v3.1/name/egypt`),
+  timeout(0.1),
+])
+  .then(res => console.log(res[0]))
+  .catch(err => console.log(err));
