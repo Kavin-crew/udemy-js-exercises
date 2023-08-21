@@ -75,7 +75,7 @@ const getCountry = function (...countries) {
   });
 };
 
-// getCountry('usa', 'portugal', 'ph', 'germany', 'japan');
+getCountry('usa', 'portugal', 'ph', 'germany', 'japan');
 
 // ////////////////////////////////////////////////////////////////////////
 // const lotteryPromise = new Promise(function (resolve, reject) {
@@ -162,58 +162,91 @@ const getCountry = function (...countries) {
 /// 2017 async await
 
 // to get our current position
-const getPosition = function () {
-  return new Promise(function (resolve, reject) {
-    navigator.geolocation.getCurrentPosition(resolve, reject);
-  });
-};
+// const getPosition = function () {
+//   return new Promise(function (resolve, reject) {
+//     navigator.geolocation.getCurrentPosition(resolve, reject);
+//   });
+// };
 
-const whereAmI = async function () {
-  try {
-    // Geolocation
-    const pos = await getPosition();
-    const { latitude: lat, longitude: lng } = pos.coords;
+// const whereAmI = async function () {
+//   try {
+//     // Geolocation
+//     const pos = await getPosition();
+//     const { latitude: lat, longitude: lng } = pos.coords;
 
-    //reverse geocoding
-    const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
-    const dataGeo = await resGeo.json();
-    // error 404 and 403 will not get rejected
-    // so we need to manually handle the error
-    if (!dataGeo.ok) throw new Error('Problem getting location');
+//     //reverse geocoding
+//     const resGeo = await fetch(`https://geocode.xyz/${lat},${lng}?geoit=json`);
+//     const dataGeo = await resGeo.json();
+//     // error 404 and 403 will not get rejected
+//     // so we need to manually handle the error
+//     if (!dataGeo.ok) throw new Error('Problem getting location');
 
-    // country data
-    const res = await fetch(
-      `https://restcountries.com/v3.1/name/${dataGeo.country}`
-    );
-    if (!res.ok) throw new Error('Problem getting location');
-    const [data] = await res.json();
+//     // country data
+//     const res = await fetch(
+//       `https://restcountries.com/v3.1/name/${dataGeo.country}`
+//     );
+//     if (!res.ok) throw new Error('Problem getting location');
+//     const [data] = await res.json();
 
-    // console.log([data]);
+//     // console.log([data]);
 
-    const html = `
-                    <article class="country">
-                    <img class="country__img" src="${data.flags.svg}" />
-                    <div class="country__data">
-                        <h3 class="country__name">${data.name.common}</h3>
-                        <h4 class="country__region">REGION</h4>
-                        <p class="country__row"><span>👫</span>${(
-                          +data.population / 1000000
-                        ).toFixed(1)}M people</p>
-                        <p class="country__row"><span>🗣️</span>${
-                          Object.entries(data.languages)[0][1]
-                        }</p>
-                        <p class="country__row"><span>💰</span>${
-                          Object.entries(data.currencies)[0][0]
-                        }</p>
-                    </div>
-                    </article>
-                `;
+//     const html = `
+//                     <article class="country">
+//                     <img class="country__img" src="${data.flags.svg}" />
+//                     <div class="country__data">
+//                         <h3 class="country__name">${data.name.common}</h3>
+//                         <h4 class="country__region">REGION</h4>
+//                         <p class="country__row"><span>👫</span>${(
+//                           +data.population / 1000000
+//                         ).toFixed(1)}M people</p>
+//                         <p class="country__row"><span>🗣️</span>${
+//                           Object.entries(data.languages)[0][1]
+//                         }</p>
+//                         <p class="country__row"><span>💰</span>${
+//                           Object.entries(data.currencies)[0][0]
+//                         }</p>
+//                     </div>
+//                     </article>
+//                 `;
 
-    countriesContainer.insertAdjacentHTML('beforeend', html);
-    countriesContainer.style.opacity = '1';
-  } catch (err) {
-    console.error(err.message);
-  }
-};
+//     countriesContainer.insertAdjacentHTML('beforeend', html);
+//     countriesContainer.style.opacity = '1';
+//   } catch (err) {
+//     console.error(err.message);
+//   }
+// };
 
-whereAmI();
+// (async function () {
+//   try {
+//     const response = await whereAmI();
+//   } catch (err) {
+//     console.error(err);
+//   }
+// })();
+
+// ///////////////////////////////
+// parallel promises
+// const getJSON = function (url, errorMsg = 'Something went wrong') {
+//   return fetch(url).then(response => {
+//     if (!response.ok) throw new Error(`${errorMsg} (${response.status})`);
+
+//     return response.json();
+//   });
+// };
+
+// const get3Countries = async function (c1, c2, c3) {
+//   try {
+//     // make all request parallel since they are not depending on each other
+//     const data = await Promise.all([
+//       getJSON(`https://restcountries.com/v3.1/name/${c1}`),
+//       getJSON(`https://restcountries.com/v3.1/name/${c2}`),
+//       getJSON(`https://restcountries.com/v3.1/name/${c3}`),
+//     ]);
+//     console.log(data.map(country => country[0].capital.join()));
+//     // ['Lisbon'] ['Ottawa'] ['Dodoma']
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
+
+// get3Countries('portugal', 'canada', 'tanzania');
