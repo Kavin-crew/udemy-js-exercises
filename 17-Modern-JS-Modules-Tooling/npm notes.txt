@@ -1,0 +1,3 @@
+npm init
+npm i leaflet --include=dev
+npm i lodash-es
