@@ -1,3 +1,10 @@
 npm init
-npm i leaflet --include=dev
+npm i leaflet --save-dev
 npm i lodash-es
+
+npm i parcel --save-dev
+npx parcel index.html
+
+	
+import 'core-js/stable';
+import 'regenerator-runtime/runtime';

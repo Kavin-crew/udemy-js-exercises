@@ -15,12 +15,12 @@ console.log('importing module from script.js');
 // console.log(ShoppingCart);
 // ShoppingCart.addToCart('bread', 5);
 
-// import add, { cart } from './shoppingCart.js';
-// add('pizza', 2);
-// add('bread', 52);
-// add('pie', 22);
+import add, { cart } from './shoppingCart.js';
+add('pizza', 2);
+add('bread', 52);
+add('pie', 22);
 
-// console.log(cart);
+console.log(cart);
 
 // const ShoppingCart2 = (function () {
 //   const cart = [];
@@ -64,3 +64,7 @@ console.log(stateClone);
 // lodash
 // creates a copy of an object using lodash
 const stateDeepClone = cloneDeep(state);
+
+if (module.hot) {
+  module.hot.accept('');
+}
